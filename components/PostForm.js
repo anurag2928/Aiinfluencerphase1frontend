@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
+import API_URL from '../config/api';
 
 export default function PostForm(){
   const [topic, setTopic] = useState('');
@@ -15,7 +16,7 @@ export default function PostForm(){
     if(!topic) return alert('enter topic');
     setLoading(true);
     try {
-      const resp = await axios.post('http://localhost:4000/ai/generate-all', { topic });
+      const resp = await axios.post(`${API_URL}/ai/generate-all`, { topic });
       setCaption(resp.data.caption || '');
       setHashtags(resp.data.hashtags || '');
       setImageBase64(resp.data.imageBase64 || null);
@@ -27,7 +28,7 @@ export default function PostForm(){
   async function handlePostNow(e){
     e.preventDefault();
     if(!caption) return alert('generate or enter caption');
-    await axios.post('http://localhost:4000/posts/create', { content: caption, hashtags, provider, postNow: true });
+    await axios.post(`${API_URL}/posts/create`, { content: caption, hashtags, provider, postNow: true });
     alert('Post queued for immediate publishing (mock).');
   }
 
@@ -35,7 +36,7 @@ export default function PostForm(){
     e.preventDefault();
     if(!caption) return alert('generate or enter caption');
     if(!scheduledAt) return alert('choose schedule date/time');
-    await axios.post('http://localhost:4000/posts/create', { content: caption, hashtags, provider, scheduledAt, postNow: false });
+    await axios.post(`${API_URL}/posts/create`, { content: caption, hashtags, provider, scheduledAt, postNow: false });
     alert('Post scheduled.');
   }
 

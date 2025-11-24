@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
+import API_URL from '../config/api';
 
 export default function History(){
   const [posts, setPosts] = useState([]);
@@ -8,7 +9,7 @@ export default function History(){
   const [filter, setFilter] = useState('all');
   
   useEffect(()=>{ 
-    axios.get('http://localhost:4000/posts/list')
+    axios.get(`${API_URL}/posts/list`)
       .then(r=>{
         setPosts(r.data || []);
         setLoading(false);
