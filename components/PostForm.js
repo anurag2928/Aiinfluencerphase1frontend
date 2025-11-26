@@ -10,18 +10,52 @@ export default function PostForm(){
   const [provider, setProvider] = useState('x');
   const [scheduledAt, setScheduledAt] = useState('');
   const [loading, setLoading] = useState(false);
+  const [colorScheme, setColorScheme] = useState('blue-gradient');
+
+  // 20 Crypto topic recommendations: 10 facts + 10 education
+  const cryptoTopics = {
+    facts: [
+      'Bitcoin Pizza Day: 10,000 BTC for 2 Pizzas',
+      'Lost Bitcoin: 20% of All BTC is Lost Forever',
+      'Satoshi Nakamoto Identity Still Unknown',
+      'First Bitcoin Transaction in 2009',
+      'Ethereum Created by Vitalik Buterin at 19',
+      'Crypto Market Cap Exceeded $3 Trillion',
+      'El Salvador Made Bitcoin Legal Tender',
+      'NFT Sales Hit $25 Billion in 2021',
+      'DeFi Locked Value Surpassed $100 Billion',
+      'Over 20,000 Cryptocurrencies Exist Today'
+    ],
+    education: [
+      'What is Blockchain Technology?',
+      'How to Start Investing in Crypto',
+      'Understanding Crypto Wallets',
+      'DeFi vs Traditional Finance',
+      'What are Smart Contracts?',
+      'Crypto Mining Explained Simply',
+      'How to Keep Your Crypto Safe',
+      'Understanding Gas Fees',
+      'What is Staking and How it Works',
+      'Web3 and the Future of Internet'
+    ]
+  };
 
   async function handleGenerateAll(e){
     e.preventDefault();
     if(!topic) return alert('enter topic');
     setLoading(true);
     try {
-      const resp = await axios.post(`${API_URL}/ai/generate-all`, { topic });
+      console.log('Sending request to:', `${API_URL}/ai/generate-all`);
+      console.log('With data:', { topic, colorScheme });
+      const resp = await axios.post(`${API_URL}/ai/generate-all`, { topic, colorScheme });
+      console.log('Response received:', resp.data);
       setCaption(resp.data.caption || '');
       setHashtags(resp.data.hashtags || '');
       setImageBase64(resp.data.imageBase64 || null);
     } catch (err) {
-      alert('Generation failed');
+      console.error('Generation error:', err);
+      console.error('Error response:', err.response?.data);
+      alert(`Generation failed: ${err.response?.data?.error || err.message}`);
     } finally { setLoading(false); }
   }
 
@@ -67,6 +101,72 @@ export default function PostForm(){
   return (
     <div style={{maxWidth: '900px', margin: '0 auto'}}>
       <form style={{display:'grid', gap: '1.5rem'}}>
+        {/* Recommended Topics Section */}
+        <div className="card" style={{background: 'white', padding: '1.5rem'}}>
+          <h3 style={{margin: '0 0 1rem 0', fontSize: '1.125rem', fontWeight: '700', color: 'var(--gray-800)', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+            <span>💡</span>
+            <span>Trending Crypto Topics</span>
+          </h3>
+          
+          <div style={{marginBottom: '1.5rem'}}>
+            <h4 style={{fontSize: '0.875rem', fontWeight: '600', color: 'var(--gray-700)', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.375rem'}}>
+              <span>🔥</span>
+              <span>Crypto Facts</span>
+            </h4>
+            <div style={{display: 'flex', flexWrap: 'wrap', gap: '0.5rem'}}>
+              {cryptoTopics.facts.map((t, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setTopic(t)}
+                  style={{
+                    padding: '0.5rem 0.875rem',
+                    fontSize: '0.75rem',
+                    background: topic === t ? 'var(--primary)' : 'var(--gray-100)',
+                    color: topic === t ? 'white' : 'var(--gray-700)',
+                    border: topic === t ? 'none' : '1px solid var(--gray-300)',
+                    borderRadius: '1rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    fontWeight: '500'
+                  }}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <h4 style={{fontSize: '0.875rem', fontWeight: '600', color: 'var(--gray-700)', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.375rem'}}>
+              <span>🎓</span>
+              <span>Crypto Education</span>
+            </h4>
+            <div style={{display: 'flex', flexWrap: 'wrap', gap: '0.5rem'}}>
+              {cryptoTopics.education.map((t, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setTopic(t)}
+                  style={{
+                    padding: '0.5rem 0.875rem',
+                    fontSize: '0.75rem',
+                    background: topic === t ? 'var(--primary)' : 'var(--gray-100)',
+                    color: topic === t ? 'white' : 'var(--gray-700)',
+                    border: topic === t ? 'none' : '1px solid var(--gray-300)',
+                    borderRadius: '1rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    fontWeight: '500'
+                  }}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
         {/* AI Generation Section */}
         <div className="card" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white', padding: '2rem'}}>
           <h2 style={{margin: '0 0 0.5rem 0', fontSize: '1.5rem', fontWeight: '700'}}>
@@ -76,6 +176,51 @@ export default function PostForm(){
             Enter a topic and let AI create engaging content with images for your social media
           </p>
           
+          <div style={{marginBottom: '1rem'}}>
+            <label style={{color: 'white', fontSize: '0.875rem', fontWeight: '600', marginBottom: '0.5rem', display: 'block'}}>
+              🎨 Choose Image Color Scheme
+            </label>
+            <div style={{display: 'flex', gap: '0.5rem', flexWrap: 'wrap'}}>
+              {[
+                {value: 'blue-gradient', label: 'Blue', color: 'linear-gradient(135deg, #1e40af 0%, #06b6d4 100%)'},
+                {value: 'purple-gradient', label: 'Purple', color: 'linear-gradient(135deg, #7c3aed 0%, #ec4899 100%)'},
+                {value: 'orange-gradient', label: 'Orange', color: 'linear-gradient(135deg, #ea580c 0%, #fbbf24 100%)'},
+                {value: 'green-gradient', label: 'Green', color: 'linear-gradient(135deg, #059669 0%, #14b8a6 100%)'},
+                {value: 'pink-gradient', label: 'Pink', color: 'linear-gradient(135deg, #db2777 0%, #f43f5e 100%)'},
+                {value: 'dark-gradient', label: 'Dark', color: 'linear-gradient(135deg, #1e1b4b 0%, #581c87 100%)'}
+              ].map(scheme => (
+                <button
+                  key={scheme.value}
+                  type="button"
+                  onClick={() => setColorScheme(scheme.value)}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    background: colorScheme === scheme.value ? 'white' : 'rgba(255,255,255,0.2)',
+                    color: colorScheme === scheme.value ? '#667eea' : 'white',
+                    border: colorScheme === scheme.value ? 'none' : '2px solid rgba(255,255,255,0.3)',
+                    borderRadius: '0.5rem',
+                    cursor: 'pointer',
+                    fontSize: '0.813rem',
+                    fontWeight: '600',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.375rem',
+                    boxShadow: colorScheme === scheme.value ? '0 2px 8px rgba(0,0,0,0.2)' : 'none'
+                  }}
+                >
+                  <div style={{
+                    width: '16px',
+                    height: '16px',
+                    borderRadius: '50%',
+                    background: scheme.color,
+                    border: '2px solid white'
+                  }}></div>
+                  {scheme.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          
           <div style={{display: 'flex', gap: '0.75rem', flexWrap: 'wrap'}}>
             <input 
               style={{
@@ -84,11 +229,12 @@ export default function PostForm(){
                 border: 'none',
                 borderRadius: '0.5rem',
                 fontSize: '0.938rem',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                minWidth: '250px'
               }} 
               value={topic} 
               onChange={e=>setTopic(e.target.value)} 
-              placeholder="e.g. morning productivity hacks, tech trends, healthy recipes..." 
+              placeholder="e.g. Bitcoin Pizza Day, What is Blockchain, DeFi Explained..." 
             />
             <button 
               onClick={handleGenerateAll} 
