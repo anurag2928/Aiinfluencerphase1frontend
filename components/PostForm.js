@@ -62,15 +62,15 @@ export default function PostForm(){
   async function handlePostNow(e){
     e.preventDefault();
     if(!caption) return alert('generate or enter caption');
-    await axios.post(`${API_URL}/posts/create`, { content: caption, hashtags, provider, postNow: true });
-    alert('Post queued for immediate publishing (mock).');
+    await axios.post(`${API_URL}/posts/create`, { content: caption, hashtags, provider, postNow: true, imageBase64 });
+    alert('Post queued for immediate publishing.');
   }
 
   async function handleSchedule(e){
     e.preventDefault();
     if(!caption) return alert('generate or enter caption');
     if(!scheduledAt) return alert('choose schedule date/time');
-    await axios.post(`${API_URL}/posts/create`, { content: caption, hashtags, provider, scheduledAt, postNow: false });
+    await axios.post(`${API_URL}/posts/create`, { content: caption, hashtags, provider, scheduledAt, postNow: false, imageBase64 });
     alert('Post scheduled.');
   }
 
@@ -97,6 +97,13 @@ export default function PostForm(){
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   }
+
+  // A simple list of accounts. In a real app, this would come from the backend.
+  const accounts = ['default', 'business'];
+  const providers = [
+    { value: 'x', label: 'Twitter/X' },
+    { value: 'instagram', label: 'Instagram' }
+  ];
 
   return (
     <div style={{maxWidth: '900px', margin: '0 auto'}}>
