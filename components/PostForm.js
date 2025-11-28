@@ -2,7 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import API_URL from '../config/api';
 
-export default function PostForm(){
+export default function PostForm() {
   const [topic, setTopic] = useState('');
   const [caption, setCaption] = useState('');
   const [hashtags, setHashtags] = useState('');
@@ -40,9 +40,9 @@ export default function PostForm(){
     ]
   };
 
-  async function handleGenerateAll(e){
+  async function handleGenerateAll(e) {
     e.preventDefault();
-    if(!topic) return alert('enter topic');
+    if (!topic) return alert('enter topic');
     setLoading(true);
     try {
       console.log('Sending request to:', `${API_URL}/ai/generate-all`);
@@ -59,30 +59,40 @@ export default function PostForm(){
     } finally { setLoading(false); }
   }
 
-  async function handlePostNow(e){
+  async function handlePostNow(e) {
     e.preventDefault();
-    if(!caption) return alert('generate or enter caption');
-    await axios.post(`${API_URL}/posts/create`, { content: caption, hashtags, provider, postNow: true, imageBase64 });
-    alert('Post queued for immediate publishing.');
+    if (!caption) return alert('generate or enter caption');
+    try {
+      await axios.post(`${API_URL}/posts/create`, { content: caption, hashtags, provider, postNow: true, imageBase64 });
+      alert('Post queued for immediate publishing.');
+    } catch (err) {
+      console.error('Post error:', err);
+      alert(`Post failed: ${err.response?.data?.error || err.message}`);
+    }
   }
 
-  async function handleSchedule(e){
+  async function handleSchedule(e) {
     e.preventDefault();
-    if(!caption) return alert('generate or enter caption');
-    if(!scheduledAt) return alert('choose schedule date/time');
-    await axios.post(`${API_URL}/posts/create`, { content: caption, hashtags, provider, scheduledAt, postNow: false, imageBase64 });
-    alert('Post scheduled.');
+    if (!caption) return alert('generate or enter caption');
+    if (!scheduledAt) return alert('choose schedule date/time');
+    try {
+      await axios.post(`${API_URL}/posts/create`, { content: caption, hashtags, provider, scheduledAt, postNow: false, imageBase64 });
+      alert('Post scheduled.');
+    } catch (err) {
+      console.error('Schedule error:', err);
+      alert(`Schedule failed: ${err.response?.data?.error || err.message}`);
+    }
   }
 
-  function copyText(text){
-    if(!text) return;
-    navigator.clipboard.writeText(text).then(()=>{
+  function copyText(text) {
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() => {
       alert('Copied to clipboard');
-    }).catch(()=>alert('Copy failed'));
+    }).catch(() => alert('Copy failed'));
   }
 
-  function downloadImage(){
-    if(!imageBase64) return alert('No image');
+  function downloadImage() {
+    if (!imageBase64) return alert('No image');
     const byteChars = atob(imageBase64);
     const byteNumbers = new Array(byteChars.length);
     for (let i = 0; i < byteChars.length; i++) byteNumbers[i] = byteChars.charCodeAt(i);
@@ -106,21 +116,21 @@ export default function PostForm(){
   ];
 
   return (
-    <div style={{maxWidth: '900px', margin: '0 auto'}}>
-      <form style={{display:'grid', gap: '1.5rem'}}>
+    <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+      <form style={{ display: 'grid', gap: '1.5rem' }}>
         {/* Recommended Topics Section */}
-        <div className="card" style={{background: 'white', padding: '1.5rem'}}>
-          <h3 style={{margin: '0 0 1rem 0', fontSize: '1.125rem', fontWeight: '700', color: 'var(--gray-800)', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+        <div className="card" style={{ background: 'white', padding: '1.5rem' }}>
+          <h3 style={{ margin: '0 0 1rem 0', fontSize: '1.125rem', fontWeight: '700', color: 'var(--gray-800)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <span>💡</span>
             <span>Trending Crypto Topics</span>
           </h3>
-          
-          <div style={{marginBottom: '1.5rem'}}>
-            <h4 style={{fontSize: '0.875rem', fontWeight: '600', color: 'var(--gray-700)', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.375rem'}}>
+
+          <div style={{ marginBottom: '1.5rem' }}>
+            <h4 style={{ fontSize: '0.875rem', fontWeight: '600', color: 'var(--gray-700)', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
               <span>🔥</span>
               <span>Crypto Facts</span>
             </h4>
-            <div style={{display: 'flex', flexWrap: 'wrap', gap: '0.5rem'}}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
               {cryptoTopics.facts.map((t, i) => (
                 <button
                   key={i}
@@ -145,11 +155,11 @@ export default function PostForm(){
           </div>
 
           <div>
-            <h4 style={{fontSize: '0.875rem', fontWeight: '600', color: 'var(--gray-700)', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.375rem'}}>
+            <h4 style={{ fontSize: '0.875rem', fontWeight: '600', color: 'var(--gray-700)', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
               <span>🎓</span>
               <span>Crypto Education</span>
             </h4>
-            <div style={{display: 'flex', flexWrap: 'wrap', gap: '0.5rem'}}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
               {cryptoTopics.education.map((t, i) => (
                 <button
                   key={i}
@@ -175,26 +185,26 @@ export default function PostForm(){
         </div>
 
         {/* AI Generation Section */}
-        <div className="card" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white', padding: '2rem'}}>
-          <h2 style={{margin: '0 0 0.5rem 0', fontSize: '1.5rem', fontWeight: '700'}}>
+        <div className="card" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white', padding: '2rem' }}>
+          <h2 style={{ margin: '0 0 0.5rem 0', fontSize: '1.5rem', fontWeight: '700' }}>
             ✨ AI Content Generator
           </h2>
-          <p style={{margin: '0 0 1.5rem 0', opacity: 0.9, fontSize: '0.875rem'}}>
+          <p style={{ margin: '0 0 1.5rem 0', opacity: 0.9, fontSize: '0.875rem' }}>
             Enter a topic and let AI create engaging content with images for your social media
           </p>
-          
-          <div style={{marginBottom: '1rem'}}>
-            <label style={{color: 'white', fontSize: '0.875rem', fontWeight: '600', marginBottom: '0.5rem', display: 'block'}}>
+
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{ color: 'white', fontSize: '0.875rem', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
               🎨 Choose Image Color Scheme
             </label>
-            <div style={{display: 'flex', gap: '0.5rem', flexWrap: 'wrap'}}>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
               {[
-                {value: 'blue-gradient', label: 'Blue', color: 'linear-gradient(135deg, #1e40af 0%, #06b6d4 100%)'},
-                {value: 'purple-gradient', label: 'Purple', color: 'linear-gradient(135deg, #7c3aed 0%, #ec4899 100%)'},
-                {value: 'orange-gradient', label: 'Orange', color: 'linear-gradient(135deg, #ea580c 0%, #fbbf24 100%)'},
-                {value: 'green-gradient', label: 'Green', color: 'linear-gradient(135deg, #059669 0%, #14b8a6 100%)'},
-                {value: 'pink-gradient', label: 'Pink', color: 'linear-gradient(135deg, #db2777 0%, #f43f5e 100%)'},
-                {value: 'dark-gradient', label: 'Dark', color: 'linear-gradient(135deg, #1e1b4b 0%, #581c87 100%)'}
+                { value: 'blue-gradient', label: 'Blue', color: 'linear-gradient(135deg, #1e40af 0%, #06b6d4 100%)' },
+                { value: 'purple-gradient', label: 'Purple', color: 'linear-gradient(135deg, #7c3aed 0%, #ec4899 100%)' },
+                { value: 'orange-gradient', label: 'Orange', color: 'linear-gradient(135deg, #ea580c 0%, #fbbf24 100%)' },
+                { value: 'green-gradient', label: 'Green', color: 'linear-gradient(135deg, #059669 0%, #14b8a6 100%)' },
+                { value: 'pink-gradient', label: 'Pink', color: 'linear-gradient(135deg, #db2777 0%, #f43f5e 100%)' },
+                { value: 'dark-gradient', label: 'Dark', color: 'linear-gradient(135deg, #1e1b4b 0%, #581c87 100%)' }
               ].map(scheme => (
                 <button
                   key={scheme.value}
@@ -227,9 +237,9 @@ export default function PostForm(){
               ))}
             </div>
           </div>
-          
-          <div style={{display: 'flex', gap: '0.75rem', flexWrap: 'wrap'}}>
-            <input 
+
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <input
               style={{
                 flex: 1,
                 padding: '0.875rem 1rem',
@@ -238,15 +248,15 @@ export default function PostForm(){
                 fontSize: '0.938rem',
                 boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
                 minWidth: '250px'
-              }} 
-              value={topic} 
-              onChange={e=>setTopic(e.target.value)} 
-              placeholder="e.g. Bitcoin Pizza Day, What is Blockchain, DeFi Explained..." 
+              }}
+              value={topic}
+              onChange={e => setTopic(e.target.value)}
+              placeholder="e.g. Bitcoin Pizza Day, What is Blockchain, DeFi Explained..."
             />
-            <button 
-              onClick={handleGenerateAll} 
-              disabled={loading} 
-              type="button" 
+            <button
+              onClick={handleGenerateAll}
+              disabled={loading}
+              type="button"
               style={{
                 padding: '0.875rem 1.75rem',
                 background: 'white',
@@ -271,19 +281,19 @@ export default function PostForm(){
 
         {/* Content Editor Section */}
         <div className="card">
-          <h3 style={{margin: '0 0 1.25rem 0', fontSize: '1.125rem', fontWeight: '700', color: 'var(--gray-800)'}}>
+          <h3 style={{ margin: '0 0 1.25rem 0', fontSize: '1.125rem', fontWeight: '700', color: 'var(--gray-800)' }}>
             📝 Your Content
           </h3>
-          
-          <div style={{display: 'grid', gap: '1.25rem'}}>
+
+          <div style={{ display: 'grid', gap: '1.25rem' }}>
             <div>
-              <label style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <span>Caption</span>
-                <span style={{fontSize: '0.75rem', color: 'var(--gray-500)', fontWeight: '400'}}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--gray-500)', fontWeight: '400' }}>
                   ({caption.length} characters)
                 </span>
               </label>
-              <textarea 
+              <textarea
                 style={{
                   width: '100%',
                   padding: '0.875rem',
@@ -291,39 +301,39 @@ export default function PostForm(){
                   fontSize: '0.938rem',
                   lineHeight: '1.6',
                   resize: 'vertical'
-                }} 
-                value={caption} 
-                onChange={e=>setCaption(e.target.value)} 
-                placeholder="Your engaging caption will appear here..." 
+                }}
+                value={caption}
+                onChange={e => setCaption(e.target.value)}
+                placeholder="Your engaging caption will appear here..."
               />
             </div>
 
             <div>
               <label>Hashtags</label>
-              <div style={{display: 'flex', gap: '0.5rem', alignItems: 'center'}}>
-                <input 
-                  style={{flex: 1, padding: '0.75rem'}} 
-                  value={hashtags} 
-                  onChange={e=>setHashtags(e.target.value)} 
-                  placeholder="#hashtag1 #hashtag2 #hashtag3" 
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                <input
+                  style={{ flex: 1, padding: '0.75rem' }}
+                  value={hashtags}
+                  onChange={e => setHashtags(e.target.value)}
+                  placeholder="#hashtag1 #hashtag2 #hashtag3"
                 />
               </div>
             </div>
 
-            <div style={{display: 'flex', gap: '0.625rem', flexWrap: 'wrap'}}>
-              <button 
-                type="button" 
-                onClick={()=>copyText(caption)} 
+            <div style={{ display: 'flex', gap: '0.625rem', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={() => copyText(caption)}
                 disabled={!caption}
-                style={{display: 'flex', alignItems: 'center', gap: '0.375rem'}}
+                style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}
               >
                 📋 Copy Caption
               </button>
-              <button 
-                type="button" 
-                onClick={()=>copyText(hashtags)} 
+              <button
+                type="button"
+                onClick={() => copyText(hashtags)}
                 disabled={!hashtags}
-                style={{display: 'flex', alignItems: 'center', gap: '0.375rem'}}
+                style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}
               >
                 #️⃣ Copy Hashtags
               </button>
@@ -333,10 +343,10 @@ export default function PostForm(){
 
         {/* Image Preview Section */}
         <div className="card">
-          <h3 style={{margin: '0 0 1rem 0', fontSize: '1.125rem', fontWeight: '700', color: 'var(--gray-800)'}}>
+          <h3 style={{ margin: '0 0 1rem 0', fontSize: '1.125rem', fontWeight: '700', color: 'var(--gray-800)' }}>
             🖼️ Generated Image
           </h3>
-          
+
           <div style={{
             border: '2px dashed var(--gray-300)',
             borderRadius: 'var(--radius-lg)',
@@ -349,25 +359,25 @@ export default function PostForm(){
             justifyContent: 'center'
           }}>
             {loading && !imageBase64 ? (
-              <div style={{textAlign: 'center'}}>
-                <div style={{fontSize: '3rem', marginBottom: '1rem', animation: 'pulse 2s infinite'}}>🎨</div>
-                <p style={{color: 'var(--gray-600)', fontWeight: '500'}}>Creating your stunning image...</p>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '3rem', marginBottom: '1rem', animation: 'pulse 2s infinite' }}>🎨</div>
+                <p style={{ color: 'var(--gray-600)', fontWeight: '500' }}>Creating your stunning image...</p>
               </div>
             ) : imageBase64 ? (
-              <div style={{width: '100%'}}>
-                <img 
-                  src={`data:image/png;base64,${imageBase64}`} 
-                  alt="Generated" 
+              <div style={{ width: '100%' }}>
+                <img
+                  src={`data:image/png;base64,${imageBase64}`}
+                  alt="Generated"
                   style={{
                     maxWidth: '100%',
                     height: 'auto',
                     borderRadius: 'var(--radius)',
                     boxShadow: 'var(--shadow-xl)',
                     marginBottom: '1rem'
-                  }} 
+                  }}
                 />
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={downloadImage}
                   style={{
                     background: 'var(--success)',
@@ -380,9 +390,9 @@ export default function PostForm(){
                 </button>
               </div>
             ) : (
-              <div style={{textAlign: 'center'}}>
-                <div style={{fontSize: '3rem', marginBottom: '1rem', opacity: 0.3}}>🖼️</div>
-                <p style={{color: 'var(--gray-500)', fontSize: '0.875rem'}}>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.3 }}>🖼️</div>
+                <p style={{ color: 'var(--gray-500)', fontSize: '0.875rem' }}>
                   No image yet. Generate content above to create an AI image.
                 </p>
               </div>
@@ -391,18 +401,18 @@ export default function PostForm(){
         </div>
 
         {/* Publishing Options Section */}
-        <div className="card" style={{background: 'var(--gray-50)', border: '1px solid var(--gray-200)'}}>
-          <h3 style={{margin: '0 0 1.25rem 0', fontSize: '1.125rem', fontWeight: '700', color: 'var(--gray-800)'}}>
+        <div className="card" style={{ background: 'var(--gray-50)', border: '1px solid var(--gray-200)' }}>
+          <h3 style={{ margin: '0 0 1.25rem 0', fontSize: '1.125rem', fontWeight: '700', color: 'var(--gray-800)' }}>
             🚀 Publishing Options
           </h3>
-          
-          <div style={{display: 'grid', gap: '1.25rem'}}>
-            <div style={{display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))'}}>
+
+          <div style={{ display: 'grid', gap: '1.25rem' }}>
+            <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))' }}>
               <div>
                 <label>Social Platform</label>
-                <select 
-                  value={provider} 
-                  onChange={e=>setProvider(e.target.value)} 
+                <select
+                  value={provider}
+                  onChange={e => setProvider(e.target.value)}
                   style={{
                     padding: '0.75rem',
                     fontSize: '0.938rem',
@@ -416,11 +426,11 @@ export default function PostForm(){
 
               <div>
                 <label>Schedule Date & Time (Optional)</label>
-                <input 
-                  type="datetime-local" 
-                  value={scheduledAt} 
-                  onChange={e=>setScheduledAt(e.target.value)} 
-                  style={{padding: '0.75rem', fontSize: '0.938rem'}} 
+                <input
+                  type="datetime-local"
+                  value={scheduledAt}
+                  onChange={e => setScheduledAt(e.target.value)}
+                  style={{ padding: '0.75rem', fontSize: '0.938rem' }}
                 />
               </div>
             </div>
@@ -432,8 +442,8 @@ export default function PostForm(){
               borderTop: '1px solid var(--gray-300)',
               flexWrap: 'wrap'
             }}>
-              <button 
-                onClick={handlePostNow} 
+              <button
+                onClick={handlePostNow}
                 type="button"
                 className="btn-primary"
                 style={{
@@ -451,8 +461,8 @@ export default function PostForm(){
                 <span>⚡</span>
                 <span>Post Now</span>
               </button>
-              <button 
-                onClick={handleSchedule} 
+              <button
+                onClick={handleSchedule}
                 type="button"
                 className="btn-primary"
                 style={{
