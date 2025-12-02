@@ -2,15 +2,25 @@ import { useState } from 'react';
 import axios from 'axios';
 import API_URL from '../config/api';
 
-export default function PostForm() {
+export default function PostForm({ initialData }) {
   const [topic, setTopic] = useState('');
-  const [caption, setCaption] = useState('');
-  const [hashtags, setHashtags] = useState('');
-  const [imageBase64, setImageBase64] = useState(null);
-  const [provider, setProvider] = useState('x');
+  const [caption, setCaption] = useState(initialData?.content || '');
+  const [hashtags, setHashtags] = useState(initialData?.hashtags || '');
+  const [imageBase64, setImageBase64] = useState(initialData?.imageUrl || null);
+  const [provider, setProvider] = useState(initialData?.provider || 'x');
   const [scheduledAt, setScheduledAt] = useState('');
   const [loading, setLoading] = useState(false);
   const [colorScheme, setColorScheme] = useState('blue-gradient');
+  const [savedPostId, setSavedPostId] = useState(initialData?.id || null);
+
+  // Update state if initialData changes (e.g. after fetch)
+  if (initialData && caption === '' && initialData.content !== caption) {
+    setCaption(initialData.content || '');
+    setHashtags(initialData.hashtags || '');
+    setImageBase64(initialData.imageUrl || null);
+    setProvider(initialData.provider || 'x');
+    setSavedPostId(initialData.id || null);
+  }
 
   // 20 Crypto topic recommendations: 10 facts + 10 education
   const cryptoTopics = {
@@ -61,9 +71,10 @@ export default function PostForm() {
 
   async function handlePostNow(e) {
     e.preventDefault();
-    if (!caption) return alert('generate or enter caption');
+    if (!savedPostId) return alert('Please save the post first!');
+
     try {
-      await axios.post(`${API_URL}/posts/create`, { content: caption, hashtags, provider, postNow: true, imageBase64 });
+      await axios.post(`${API_URL}/posts/publish-now`, { postId: savedPostId, provider });
       alert('Post queued for immediate publishing.');
     } catch (err) {
       console.error('Post error:', err);
@@ -81,6 +92,22 @@ export default function PostForm() {
     } catch (err) {
       console.error('Schedule error:', err);
       alert(`Schedule failed: ${err.response?.data?.error || err.message}`);
+    }
+  }
+
+  async function handleSaveDraft(e) {
+    e.preventDefault();
+    if (!caption) return alert('generate or enter caption');
+    try {
+      // No postNow, no scheduledAt -> defaults to 'draft' status
+      const res = await axios.post(`${API_URL}/posts/create`, { content: caption, hashtags, provider, imageBase64 });
+      if (res.data && res.data.post && res.data.post.id) {
+        setSavedPostId(res.data.post.id);
+        alert('Post saved to database! You can now publish it.');
+      }
+    } catch (err) {
+      console.error('Save error:', err);
+      alert(`Save failed: ${err.response?.data?.error || err.message}`);
     }
   }
 
@@ -111,7 +138,7 @@ export default function PostForm() {
   // A simple list of accounts. In a real app, this would come from the backend.
   const accounts = ['default', 'business'];
   const providers = [
-    { value: 'x', label: 'Twitter/X' },
+    { value: 'x', label: 'X' },
     { value: 'instagram', label: 'Instagram' }
   ];
 
@@ -444,12 +471,14 @@ export default function PostForm() {
             }}>
               <button
                 onClick={handlePostNow}
+                disabled={!savedPostId}
                 type="button"
                 className="btn-primary"
                 style={{
                   flex: 1,
                   padding: '0.875rem 1.5rem',
-                  background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
+                  background: savedPostId ? 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)' : 'var(--gray-300)',
+                  cursor: savedPostId ? 'pointer' : 'not-allowed',
                   fontSize: '1rem',
                   fontWeight: '700',
                   display: 'flex',
@@ -457,6 +486,7 @@ export default function PostForm() {
                   justifyContent: 'center',
                   gap: '0.5rem'
                 }}
+                title={!savedPostId ? "Save to database first" : "Post immediately"}
               >
                 <span>⚡</span>
                 <span>Post Now</span>
@@ -481,6 +511,30 @@ export default function PostForm() {
                 <span>Schedule Post</span>
               </button>
             </div>
+
+            <button
+              onClick={handleSaveDraft}
+              type="button"
+              style={{
+                width: '100%',
+                padding: '0.875rem 1.5rem',
+                background: 'white',
+                border: '1px solid var(--gray-300)',
+                color: 'var(--gray-700)',
+                fontSize: '1rem',
+                fontWeight: '600',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+                borderRadius: '0.5rem',
+                cursor: 'pointer',
+                marginTop: '0.5rem'
+              }}
+            >
+              <span>💾</span>
+              <span>Save to database</span>
+            </button>
           </div>
         </div>
       </form>

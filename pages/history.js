@@ -3,19 +3,19 @@ import axios from 'axios';
 import Link from 'next/link';
 import API_URL from '../config/api';
 
-export default function History(){
+export default function History() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
-  
-  useEffect(()=>{ 
+
+  useEffect(() => {
     axios.get(`${API_URL}/posts/list`)
-      .then(r=>{
+      .then(r => {
         setPosts(r.data || []);
         setLoading(false);
       })
-      .catch(()=>setLoading(false));
-  },[]);
+      .catch(() => setLoading(false));
+  }, []);
 
   const getStatusColor = (status) => {
     const colors = {
@@ -39,15 +39,15 @@ export default function History(){
     return emojis[status] || '📄';
   };
 
-  const filteredPosts = filter === 'all' 
-    ? posts 
+  const filteredPosts = filter === 'all'
+    ? posts
     : posts.filter(p => p.status === filter);
 
   return (
-    <div className="container" style={{maxWidth: '1200px', paddingTop: '2rem', paddingBottom: '3rem'}}>
+    <div className="container" style={{ maxWidth: '1200px', paddingTop: '2rem', paddingBottom: '3rem' }}>
       {/* Header */}
-      <div style={{marginBottom: '2rem'}}>
-        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem'}}>
+      <div style={{ marginBottom: '2rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem' }}>
           <div>
             <h1 style={{
               fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
@@ -57,7 +57,7 @@ export default function History(){
             }}>
               📊 Post History
             </h1>
-            <p style={{color: 'var(--gray-600)', margin: 0, fontSize: '0.938rem'}}>
+            <p style={{ color: 'var(--gray-600)', margin: 0, fontSize: '0.938rem' }}>
               Manage and track all your social media posts
             </p>
           </div>
@@ -86,7 +86,7 @@ export default function History(){
           {['all', 'posted', 'scheduled', 'draft', 'failed'].map(status => {
             const count = status === 'all' ? posts.length : posts.filter(p => p.status === status).length;
             return (
-              <div 
+              <div
                 key={status}
                 onClick={() => setFilter(status)}
                 style={{
@@ -101,10 +101,10 @@ export default function History(){
                   border: filter === status ? 'none' : '1px solid var(--gray-200)'
                 }}
               >
-                <div style={{fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.25rem'}}>
+                <div style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.25rem' }}>
                   {count}
                 </div>
-                <div style={{fontSize: '0.75rem', textTransform: 'capitalize', fontWeight: '600'}}>
+                <div style={{ fontSize: '0.75rem', textTransform: 'capitalize', fontWeight: '600' }}>
                   {status === 'all' ? 'Total' : status}
                 </div>
               </div>
@@ -115,17 +115,17 @@ export default function History(){
 
       {/* Posts Grid */}
       {loading ? (
-        <div style={{textAlign: 'center', padding: '4rem'}}>
-          <div style={{fontSize: '3rem', marginBottom: '1rem', animation: 'pulse 2s infinite'}}>⏳</div>
-          <p style={{color: 'var(--gray-600)'}}>Loading posts...</p>
+        <div style={{ textAlign: 'center', padding: '4rem' }}>
+          <div style={{ fontSize: '3rem', marginBottom: '1rem', animation: 'pulse 2s infinite' }}>⏳</div>
+          <p style={{ color: 'var(--gray-600)' }}>Loading posts...</p>
         </div>
       ) : filteredPosts.length === 0 ? (
-        <div className="card" style={{textAlign: 'center', padding: '3rem'}}>
-          <div style={{fontSize: '4rem', marginBottom: '1rem', opacity: 0.3}}>📭</div>
-          <h3 style={{color: 'var(--gray-700)', marginBottom: '0.5rem'}}>
+        <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
+          <div style={{ fontSize: '4rem', marginBottom: '1rem', opacity: 0.3 }}>📭</div>
+          <h3 style={{ color: 'var(--gray-700)', marginBottom: '0.5rem' }}>
             {filter === 'all' ? 'No posts yet' : `No ${filter} posts`}
           </h3>
-          <p style={{color: 'var(--gray-600)', marginBottom: '1.5rem'}}>
+          <p style={{ color: 'var(--gray-600)', marginBottom: '1.5rem' }}>
             Start creating amazing content with AI
           </p>
           <Link href="/create-post">
@@ -143,16 +143,42 @@ export default function History(){
           gap: '1.5rem'
         }}>
           {filteredPosts.map(post => (
-            <div 
-              key={post.id} 
+            <div
+              key={post.id}
               className="card"
               style={{
                 display: 'flex',
                 flexDirection: 'column',
                 position: 'relative',
-                overflow: 'hidden'
+                overflow: 'hidden',
+                height: '100%'
               }}
             >
+              {/* Image Preview */}
+              {post.imageUrl && (
+                <div style={{
+                  height: '200px',
+                  overflow: 'hidden',
+                  background: 'var(--gray-100)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <img
+                    src={
+                      post.imageUrl?.startsWith('http')
+                        ? post.imageUrl
+                        : (post.imageUrl?.startsWith('data:') ? post.imageUrl : `data:image/png;base64,${post.imageUrl}`)
+                    }
+                    alt="Post content"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover'
+                    }}
+                  />
+                </div>
+              )}
               {/* Status Badge */}
               <div style={{
                 position: 'absolute',
@@ -175,7 +201,7 @@ export default function History(){
               </div>
 
               {/* Content */}
-              <div style={{flex: 1}}>
+              <div style={{ flex: 1 }}>
                 <div style={{
                   fontSize: '0.75rem',
                   color: 'var(--gray-500)',
@@ -187,9 +213,9 @@ export default function History(){
                 }}>
                   <span>#{post.id}</span>
                   <span>•</span>
-                  <span style={{textTransform: 'uppercase'}}>{post.provider || 'X'}</span>
+                  <span style={{ textTransform: 'uppercase' }}>{post.provider || 'X'}</span>
                 </div>
-                
+
                 <p style={{
                   color: 'var(--gray-800)',
                   fontSize: '0.938rem',
@@ -230,7 +256,7 @@ export default function History(){
               }}>
                 <div>
                   {post.scheduledAt ? (
-                    <div style={{display: 'flex', alignItems: 'center', gap: '0.375rem'}}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
                       <span>📅</span>
                       <span>{new Date(post.scheduledAt).toLocaleDateString('en-US', {
                         month: 'short',
@@ -240,7 +266,7 @@ export default function History(){
                       })}</span>
                     </div>
                   ) : (
-                    <div style={{display: 'flex', alignItems: 'center', gap: '0.375rem'}}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
                       <span>🕐</span>
                       <span>{new Date(post.createdAt).toLocaleDateString('en-US', {
                         month: 'short',
@@ -260,6 +286,33 @@ export default function History(){
                     Published
                   </div>
                 )}
+              </div>
+
+              {/* Actions */}
+              <div style={{
+                padding: '0.75rem 0',
+                borderTop: '1px solid var(--gray-200)',
+                marginTop: 'auto',
+                display: 'flex',
+                justifyContent: 'flex-end'
+              }}>
+                <Link href={`/create-post?repost=${post.id}`}>
+                  <button style={{
+                    background: 'transparent',
+                    border: '1px solid var(--primary)',
+                    color: 'var(--primary)',
+                    padding: '0.375rem 0.75rem',
+                    fontSize: '0.75rem',
+                    borderRadius: '0.25rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.25rem',
+                    fontWeight: '600'
+                  }}>
+                    <span>🔁</span> Repost
+                  </button>
+                </Link>
               </div>
             </div>
           ))}

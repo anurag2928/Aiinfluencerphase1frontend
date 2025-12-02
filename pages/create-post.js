@@ -1,9 +1,27 @@
 import PostForm from '../components/PostForm';
 import Link from 'next/link';
 
-export default function CreatePost(){ 
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import API_URL from '../config/api';
+
+export default function CreatePost() {
+  const router = useRouter();
+  const { repost } = router.query;
+  const [initialData, setInitialData] = useState(null);
+
+  useEffect(() => {
+    if (repost) {
+      axios.get(`${API_URL}/posts/${repost}`)
+        .then(res => {
+          setInitialData(res.data);
+        })
+        .catch(err => console.error('Failed to load repost data', err));
+    }
+  }, [repost]);
   return (
-    <div className="container" style={{paddingTop: '2rem', paddingBottom: '3rem'}}>
+    <div className="container" style={{ paddingTop: '2rem', paddingBottom: '3rem' }}>
       {/* Header with Navigation */}
       <div style={{
         display: 'flex',
@@ -22,7 +40,7 @@ export default function CreatePost(){
           }}>
             ✨ Create New Post
           </h1>
-          <p style={{color: 'var(--gray-600)', margin: 0, fontSize: '0.938rem'}}>
+          <p style={{ color: 'var(--gray-600)', margin: 0, fontSize: '0.938rem' }}>
             Generate AI-powered content for your social media
           </p>
         </div>
@@ -44,10 +62,10 @@ export default function CreatePost(){
       </div>
 
       {/* Form Component */}
-      <PostForm />
+      <PostForm initialData={initialData} />
 
       {/* Back to Home Link */}
-      <div style={{textAlign: 'center', marginTop: '3rem'}}>
+      <div style={{ textAlign: 'center', marginTop: '3rem' }}>
         <Link href="/" style={{
           color: 'var(--gray-600)',
           fontSize: '0.875rem',
