@@ -2,7 +2,7 @@ export default function PrivacyPolicy() {
     return (
         <div style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem', fontFamily: 'sans-serif' }}>
             <h1>Privacy Policy</h1>
-            <p>Last updated: December 3, 2025</p>
+            <p>Last updated: {new Date().toLocaleDateString()}</p>
 
             <h2>1. Introduction</h2>
             <p>Welcome to AI Social Poster ("we," "our," or "us"). We are committed to protecting your privacy. This Privacy Policy explains how we collect, use, and share your personal information when you use our application.</p>
