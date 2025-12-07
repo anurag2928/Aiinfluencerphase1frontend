@@ -15,19 +15,25 @@ export default function CreatePost() {
     if (repost) {
       axios.get(`${API_URL}/posts/${repost}`)
         .then(res => {
-          setInitialData(res.data);
+          // Strip ID and status so it's treated as a new draft
+          const cleanData = { ...res.data };
+          delete cleanData.id;
+          delete cleanData.createdAt;
+          delete cleanData.scheduledAt;
+          delete cleanData.status;
+          setInitialData(cleanData);
         })
         .catch(err => console.error('Failed to load repost data', err));
     }
   }, [repost]);
   return (
-    <div className="container" style={{ paddingTop: '2rem', paddingBottom: '3rem' }}>
+    <div className="container" style={{ paddingTop: '2rem', paddingBottom: '4rem' }}>
       {/* Header with Navigation */}
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: '2rem',
+        marginBottom: '2.5rem',
         flexWrap: 'wrap',
         gap: '1rem'
       }}>
@@ -35,25 +41,22 @@ export default function CreatePost() {
           <h1 style={{
             fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
             fontWeight: '800',
-            color: 'var(--gray-900)',
-            margin: '0 0 0.5rem 0'
+            color: 'var(--text-main)',
+            margin: '0 0 0.5rem 0',
+            letterSpacing: '-0.02em'
           }}>
             ✨ Create New Post
           </h1>
-          <p style={{ color: 'var(--gray-600)', margin: 0, fontSize: '0.938rem' }}>
-            Generate AI-powered content for your social media
+          <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: '1rem' }}>
+            Generate AI-powered content for your social media.
           </p>
         </div>
         <Link href="/history">
-          <button style={{
-            background: 'white',
-            color: 'var(--gray-700)',
-            border: '1px solid var(--gray-300)',
-            padding: '0.75rem 1.5rem',
+          <button className="btn-secondary" style={{
             display: 'inline-flex',
             alignItems: 'center',
             gap: '0.5rem',
-            fontSize: '0.938rem'
+            fontSize: '0.95rem'
           }}>
             <span>📊</span>
             <span>View History</span>
@@ -65,16 +68,17 @@ export default function CreatePost() {
       <PostForm initialData={initialData} />
 
       {/* Back to Home Link */}
-      <div style={{ textAlign: 'center', marginTop: '3rem' }}>
+      <div style={{ textAlign: 'center', marginTop: '4rem' }}>
         <Link href="/" style={{
-          color: 'var(--gray-600)',
-          fontSize: '0.875rem',
+          color: 'var(--text-muted)',
+          fontSize: '0.95rem',
           display: 'inline-flex',
           alignItems: 'center',
-          gap: '0.5rem'
+          gap: '0.5rem',
+          fontWeight: '500'
         }}>
           <span>←</span>
-          <span>Back to Home</span>
+          <span>Back to Dashboard</span>
         </Link>
       </div>
     </div>
