@@ -14,6 +14,17 @@ export default function PostForm({ initialData }) {
   const [colorScheme, setColorScheme] = useState('blue-gradient');
   const [savedPostId, setSavedPostId] = useState(initialData?.id || null);
 
+  // Twitter Accounts State
+  const [accounts, setAccounts] = useState([]);
+  const [accountId, setAccountId] = useState(initialData?.account_id || '');
+
+  useEffect(() => {
+    // Fetch available accounts
+    axios.get(`${API_URL}/twitter-accounts/list`)
+      .then(res => setAccounts(res.data))
+      .catch(err => console.error('Failed to fetch twitter accounts', err));
+  }, []);
+
   // Update state if initialData changes (e.g. after fetch)
   // Update state if initialData changes (e.g. after fetch)
   useEffect(() => {
@@ -24,6 +35,7 @@ export default function PostForm({ initialData }) {
       setImageBase64(null); // Reset new image if loading old one
       setProvider(initialData.provider || 'x');
       setSavedPostId(initialData.id || null);
+      setAccountId(initialData.account_id || '');
     }
   }, [initialData]);
 
@@ -91,7 +103,8 @@ export default function PostForm({ initialData }) {
           provider,
           postNow: true,
           imageBase64: imageBase64 || undefined,
-          imageUrl: existingImageUrl || undefined
+          imageUrl: existingImageUrl || undefined,
+          accountId: accountId || undefined
         });
       }
       alert('Post queued for immediate publishing.');
@@ -121,7 +134,8 @@ export default function PostForm({ initialData }) {
         scheduledAt: scheduledIso,
         postNow: false,
         imageBase64: imageBase64 || undefined,
-        imageUrl: existingImageUrl || undefined
+        imageUrl: existingImageUrl || undefined,
+        accountId: accountId || undefined
       });
 
       alert(`Post successfully scheduled for ${jobDate.toLocaleString()}!`);
@@ -148,7 +162,8 @@ export default function PostForm({ initialData }) {
         hashtags,
         provider,
         imageBase64: imageBase64 || undefined,
-        imageUrl: existingImageUrl || undefined
+        imageUrl: existingImageUrl || undefined,
+        accountId: accountId || undefined
       });
       if (res.data && res.data.post && res.data.post.id) {
         setSavedPostId(res.data.post.id);
@@ -188,8 +203,6 @@ export default function PostForm({ initialData }) {
     URL.revokeObjectURL(url);
   }
 
-  // A simple list of accounts. In a real app, this would come from the backend.
-  const accounts = ['default', 'business'];
   const providers = [
     { value: 'x', label: 'X' },
     { value: 'instagram', label: 'Instagram' }
@@ -517,6 +530,29 @@ export default function PostForm({ initialData }) {
                   <option value="instagram">📸 Instagram</option>
                 </select>
               </div>
+
+              {provider === 'x' && (
+                <div>
+                  <label>Twitter Account</label>
+                  <select
+                    value={accountId}
+                    onChange={e => setAccountId(e.target.value)}
+                    style={{
+                      padding: '0.875rem',
+                      fontSize: '0.95rem',
+                      cursor: 'pointer',
+                      width: '100%'
+                    }}
+                  >
+                    <option value="">Default (from Env)</option>
+                    {accounts.map(acc => (
+                      <option key={acc.id} value={acc.id}>
+                        {acc.account_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               <div>
                 <label>Schedule Date & Time (Optional)</label>
