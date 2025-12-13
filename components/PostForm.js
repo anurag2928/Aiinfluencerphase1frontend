@@ -14,15 +14,20 @@ export default function PostForm({ initialData }) {
   const [colorScheme, setColorScheme] = useState('blue-gradient');
   const [savedPostId, setSavedPostId] = useState(initialData?.id || null);
 
-  // Twitter Accounts State
-  const [accounts, setAccounts] = useState([]);
+  // Social Accounts State
+  const [twitterAccounts, setTwitterAccounts] = useState([]);
+  const [instagramAccounts, setInstagramAccounts] = useState([]);
   const [accountId, setAccountId] = useState(initialData?.account_id || '');
 
   useEffect(() => {
     // Fetch available accounts
     axios.get(`${API_URL}/twitter-accounts/list`)
-      .then(res => setAccounts(res.data))
+      .then(res => setTwitterAccounts(res.data))
       .catch(err => console.error('Failed to fetch twitter accounts', err));
+
+    axios.get(`${API_URL}/instagram-accounts/list`)
+      .then(res => setInstagramAccounts(res.data))
+      .catch(err => console.error('Failed to fetch instagram accounts', err));
   }, []);
 
   // Update state if initialData changes (e.g. after fetch)
@@ -545,7 +550,36 @@ export default function PostForm({ initialData }) {
                     }}
                   >
                     <option value="">Default (from Env)</option>
-                    {accounts.map(acc => (
+                    {twitterAccounts.map(acc => (
+                      <option key={acc.id} value={acc.id}>
+                        {acc.account_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {provider === 'instagram' && (
+                <div>
+                  <label>Instagram Account</label>
+                  <select
+                    value={accountId}
+                    onChange={e => setAccountId(e.target.value)}
+                    style={{
+                      padding: '0.875rem',
+                      fontSize: '0.95rem',
+                      cursor: 'pointer',
+                      width: '100%'
+                    }}
+                  >
+                    {/* Default option is handled by the backend prepending it, but if array is empty we might need a fallback. 
+                        Actually instagram-accounts/list prepends default even if env only. 
+                        So we just map. But user might not have env set. 
+                        Let's assume the list returns what we need. */}
+                    {instagramAccounts.length === 0 && (
+                      <option value="default">Default / None</option>
+                    )}
+                    {instagramAccounts.map(acc => (
                       <option key={acc.id} value={acc.id}>
                         {acc.account_name}
                       </option>

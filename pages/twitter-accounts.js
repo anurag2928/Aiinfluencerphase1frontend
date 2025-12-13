@@ -100,7 +100,7 @@ export default function TwitterAccounts() {
                             <ol style={{ paddingLeft: '1.2rem', margin: '0.5rem 0' }}>
                                 <li>Go to <a href="https://developer.twitter.com/en/portal/dashboard" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)' }}>Twitter Developer Portal</a>.</li>
                                 <li>Create a Project & App.</li>
-                                <li>In App Settings, set User Authentication Settings to <strong>Read and Write</strong>.</li>
+                                <li>In App Settings, set User Authentication Settings to <strong>Read and Write</strong> and In App info set Callback URL to <strong>http://localhost:3000/callback </strong>. and Website URL to <strong>https://aiinfluencerphase1.netlify.app/</strong>.</li>
                                 <li>Regenerate <strong>API Key & Secret</strong> and <strong>Access Token & Secret</strong>.</li>
                             </ol>
                         </div>

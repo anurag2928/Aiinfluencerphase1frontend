@@ -10,8 +10,9 @@ export default function Layout({ children }) {
     return (
         <div>
             <Head>
-                <title>AI Social Poster</title>
+                <title>PostMaster AI</title>
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <link rel="icon" href="/logo.png" />
             </Head>
 
             <nav style={{
@@ -27,8 +28,9 @@ export default function Layout({ children }) {
                     alignItems: 'center',
                     padding: '0'
                 }}>
-                    <Link href="/" style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--primary)', textDecoration: 'none' }}>
-                        AI Social Poster
+                    <Link href="/" style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--primary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <img src="/logo.png" alt="PostMaster AI Logo" style={{ height: '32px', width: 'auto' }} />
+                        PostMaster AI
                     </Link>
 
                     {/* Desktop Menu */}
@@ -36,7 +38,8 @@ export default function Layout({ children }) {
                         <Link href="/">Dashboard</Link>
                         <Link href="/create-post">Create Post</Link>
                         <Link href="/history">History</Link>
-                        <Link href="/twitter-accounts">Accounts</Link>
+                        <Link href="/twitter-accounts">Twitter</Link>
+                        <Link href="/instagram-accounts">Instagram</Link>
                     </div>
 
                     {/* Mobile Menu Button */}
@@ -63,7 +66,8 @@ export default function Layout({ children }) {
                         <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>Dashboard</Link>
                         <Link href="/create-post" onClick={() => setIsMobileMenuOpen(false)}>Create Post</Link>
                         <Link href="/history" onClick={() => setIsMobileMenuOpen(false)}>History</Link>
-                        <Link href="/twitter-accounts" onClick={() => setIsMobileMenuOpen(false)}>Accounts</Link>
+                        <Link href="/twitter-accounts" onClick={() => setIsMobileMenuOpen(false)}>Twitter</Link>
+                        <Link href="/instagram-accounts" onClick={() => setIsMobileMenuOpen(false)}>Instagram</Link>
                     </div>
                 )}
             </nav>

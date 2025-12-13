@@ -32,7 +32,7 @@ export default function Home() {
             letterSpacing: '-0.02em',
             paddingBottom: '0.2em' // Prevent clipper descenders
           }}>
-            AI Social Poster
+            PostMaster AI
           </h1>
           <p style={{
             fontSize: 'clamp(1.1rem, 2vw, 1.25rem)',
